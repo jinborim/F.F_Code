@@ -5,40 +5,35 @@ using UnityEngine;
 public class Autoshoot : MonoBehaviour
 {
     private Transform bulletSpawnPoint;
-    public GameObject bulletPrefab;
-    //public enemyDead enemy;
-    public GameManager gamemanager;
 
+    [SerializeField] private GameObject bulletPrefab;
+    private GameManager gamemanager;
 
-    // Start is called before the first frame update
     void Start()
     {
-        bulletSpawnPoint = this.transform.Find("BulletSpawnPoint");
-        gamemanager = GameObject.FindObjectOfType<GameManager>();
-        //enemy = GameObject.FindObjectOfType<enemyDead>();
-        StartCoroutine(AutoBullet());
-    }
+        bulletSpawnPoint = transform.Find("BulletSpawnPoint");
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        gamemanager = FindObjectOfType<GameManager>();
+
+        StartCoroutine(AutoBullet());
     }
 
     public IEnumerator AutoBullet()
     {
-        for(int i = 0; i<3; i++)
+        if (bulletPrefab == null) yield break;
+
+        for (int i = 0; i < 3; i++)
         {
-            //총알을 만든다 
-            /* var bulletGo = Instantiate<GameObject>(this.bulletPrefab);
-            bulletGo.transform.position = this.bulletSpawnPoint.position; */
-            GameObject BulletGo = Instantiate(bulletPrefab, this.transform.position, transform.rotation);
+            Vector3 spawnPos = bulletSpawnPoint != null 
+                ? bulletSpawnPoint.position 
+                : transform.position;
 
-            yield return new WaitForSeconds(0.6f);// + 조건
+            Instantiate(bulletPrefab, spawnPos, transform.rotation);
+
+            yield return new WaitForSeconds(0.6f);
         }
-        gamemanager.Scene22(true);
-        yield break;
 
-
+        if (gamemanager != null)
+            gamemanager.Scene22(true);
     }
 }
