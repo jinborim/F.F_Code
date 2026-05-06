@@ -31,7 +31,6 @@ public class spike_Script : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         hp_manger = GameObject.FindObjectOfType<HP_Manager>();
