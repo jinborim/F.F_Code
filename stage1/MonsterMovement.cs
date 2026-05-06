@@ -9,7 +9,7 @@ public class MonsterMovement : MonoBehaviour
     private Rigidbody2D monsterRd;
     public int nextMove; 
     public float speed = 2f;
-    public int M_healtㅗ;
+    public int M_healt;
 
     public bool is_endpoint; 
     public HP_Manager hp_manger; 
