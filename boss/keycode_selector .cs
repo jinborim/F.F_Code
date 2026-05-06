@@ -16,12 +16,5 @@ public class keycode_selector : MonoBehaviour
     KeyCode.Alpha9,
 };
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-
-        // Update is called once per frame
-
-    }
+ 
 }
