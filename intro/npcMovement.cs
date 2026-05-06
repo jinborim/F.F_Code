@@ -4,63 +4,44 @@ using UnityEngine;
 
 public class npcMovement : MonoBehaviour
 {
-    public TalkText ttext;
-    private Vector3 target;
-    //Vector2 target = new Vector2(500, 88);
+  public TalkText ttext;
     public GameManager manager;
+
+    private Vector3 target;
+
+    [SerializeField] private float moveSpeed = 2f;
 
     void Start()
     {
-        manager = GameObject.FindObjectOfType<GameManager>();
-        target.Set(500, 88, this.transform.position.z);
-    }
+        manager = FindObjectOfType<GameManager>();
+        ttext = FindObjectOfType<TalkText>();
 
-    void Update()
-    {
-        
+        target = new Vector3(500f, 88f, transform.position.z);
     }
-
-    /* public void scene44(bool scene4)
-    {
-        if (scene4 == true)
-        {
-            transform.position = Vector2.MoveTowards(transform.position, target, 1f);
-        }
-        ttext.scene55(true);
-        
-    } */
-    //Graphic & Input Updates	
 
     public IEnumerator Scene44(bool scene4)
     {
-        do
+        if (!scene4) yield break;
+
+        while (Vector3.Distance(transform.position, target) > 0.05f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, target, 2f);
-            yield return new WaitForSeconds(0.01f);
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                target,
+                moveSpeed * Time.deltaTime
+            );
 
-        } while (this.transform.position != target) ;
-
-        this.transform.position = target;
-
-        if (scene4 == true)
-        {
-            manager.panel(true);
-            ttext = GameObject.FindObjectOfType<TalkText>();
-
-            yield return new WaitForSeconds(0.5f);
+            yield return null;
         }
 
-        //Call2();
-        ttext.Scene55(true);
+        transform.position = target;
 
+        if (manager != null)
+            manager.panel(true);
 
+        yield return new WaitForSeconds(0.5f);
 
+        if (ttext != null)
+            ttext.Scene55(true);
     }
-    public void Call2()
-    {
-        
-        ttext.Scene55(true);
-
-    }
-
 }
