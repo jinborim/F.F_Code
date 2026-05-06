@@ -6,9 +6,7 @@ using UnityEngine.UI;
 
 public class TopDragSlot : MonoBehaviour
 {
-/**
-* 드래그 중인 아이템의 이미지를 마우스 포인터에 표시
-**/
+
     static public TopDragSlot instance;
     public TopSlot dragSlot;
 
