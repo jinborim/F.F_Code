@@ -1,48 +1,78 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
-public class Next_Door : MonoBehaviour
+public class MonsterMovement : MonoBehaviour
 {
-    public string SceneName;
-    private Door_Test door;
-    public Select_Yes selected;
-    public bool is_Enter = false;
-    public string[] Door_dialogue = new string[2];
+
+    private Rigidbody2D monsterRd;
+    public int nextMove; 
+    public float speed = 2f;
+    public int M_healtㅗ;
+
+   public bool is_endpoint; 
+    public HP_Manager hp_manger; 
+
+    public Monster monster_; 
+    public CharacterMovement character; 
+    public Boss_Movement Boss; 
+
+    private void Awake()
+    {
+        monsterRd = GetComponent<Rigidbody2D>();
+    }
+
+    private void Start()
+    {
+        is_endpoint = false;
+        
+        hp_manger = GameObject.FindObjectOfType<HP_Manager>();
+        character = GameObject.FindObjectOfType<CharacterMovement>();
+        Boss = GameObject.FindObjectOfType<Boss_Movement>();
+
+        if (monster_ != null)
+        {
+            M_health = monster_.M_health;
+        }
+    }
+
+     private void OnCollisionEnter2D(Collision2D collision)
+    {
+        HandleDamage(collision.gameObject);
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Character") == true)
-        {
-            
-            //Debug.Log("캐릭터랑 닿음");
-            is_Enter = true;
-            selected.GetSceneName(SceneName);
-            door.Get_Dialogue(is_Enter, Door_dialogue, true);
-            
-        }
+        HandleDamage(collision.gameObject);
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void HandleDamage(GameObject target)
     {
-        if (collision.gameObject.CompareTag("Character") == true)
-        {
-            //Debug.Log("충돌 해제");
-            is_Enter = false;
-            door.Get_Dialogue(is_Enter, null, false);
+        if (!target.CompareTag("Character"))
+            return;
 
-        }
+        if (character == null || character.is_Beat)
+            return;
+
+        if (hp_manager == null || monster_ == null)
+            return;
+
+        hp_manager.Damaged(monster_.damage);
     }
 
-
-
-    // Start is called before the first frame update
-    void Start()
+    public void health_manager(int damage)
     {
-        door = GameObject.FindObjectOfType<Door_Test>();
-        selected = door.select_.GetComponentInChildren<Select_Yes>();
-        //selected = GameObject.FindObjectOfType<Select_Yes>();
-        Door_dialogue =new string[] { "다음 스테이지로 이동할까?" };
-        
+        M_health -= damage;
+
+        if (M_health <= 0)
+        {
+            if (Boss != null)
+            {
+                Boss.Rest_count -= 1;
+            }
+
+            Destroy(gameObject);
+        }
     }
 }
