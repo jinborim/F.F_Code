@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class MonsterMovement : MonoBehaviour
 {
-    /* 몬스터 AI 및 상태 관리 시스템 */
+
     private Rigidbody2D monsterRd;
     public int nextMove; 
     public float speed = 2f;
-    public int M_healt;
+    public int M_healtㅗ;
 
    public bool is_endpoint; 
     public HP_Manager hp_manger; 
@@ -27,7 +27,6 @@ public class MonsterMovement : MonoBehaviour
     {
         is_endpoint = false;
         
-        // 시작할 때 미리 찾아두기 (성능 최적화)
         hp_manger = GameObject.FindObjectOfType<HP_Manager>();
         character = GameObject.FindObjectOfType<CharacterMovement>();
         Boss = GameObject.FindObjectOfType<Boss_Movement>();
@@ -38,49 +37,42 @@ public class MonsterMovement : MonoBehaviour
         }
     }
 
-    // 캐릭터와 충돌했을 때 (물리)
-    private void OnCollisionEnter2D(Collision2D collision)
+     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Character") == true)
-        {
-            if (character.is_Beat == false)
-            {
-                if (hp_manger != null)
-                {
-                    hp_manger.Damaged(monster_.damage);
-                }
-            }
-        }
+        HandleDamage(collision.gameObject);
     }
 
-    // 캐릭터와 충돌했을 때 (트리거)
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Character") == true)
-        {
-            if (character.is_Beat == false)
-            {
-                if (hp_manger != null)
-                {
-                    hp_manger.Damaged(monster_.damage);
-                }
-            }
-        }
+        HandleDamage(collision.gameObject);
     }
 
-    // 몬스터가 데미지를 입을 때 호출되는 함수
+    private void HandleDamage(GameObject target)
+    {
+        if (!target.CompareTag("Character"))
+            return;
+
+        if (character == null || character.is_Beat)
+            return;
+
+        if (hp_manager == null || monster_ == null)
+            return;
+
+        hp_manager.Damaged(monster_.damage);
+    }
+
     public void health_manager(int damage)
     {
-        this.M_health -= damage;
-        
-        if (this.M_health <= 0)
+        M_health -= damage;
+
+        if (M_health <= 0)
         {
-            // 사망 처리 전 보스에게 알림
-            if (Boss != null) 
+            if (Boss != null)
             {
                 Boss.Rest_count -= 1;
             }
-            Destroy(gameObject); 
+
+            Destroy(gameObject);
         }
     }
 }
