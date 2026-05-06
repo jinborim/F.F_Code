@@ -7,7 +7,6 @@ public class Dialogue_Maintain : MonoBehaviour
 {
     public static Dialogue_Maintain Instance;
 
-    //public Color TeamColor;
     private void Awake()
     {
         if (Instance != null)
