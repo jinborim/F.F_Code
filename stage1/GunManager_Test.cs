@@ -4,47 +4,72 @@ using UnityEngine;
 
 public class GunManager_Test : MonoBehaviour
 {
-    public SelectedGunInventory gunventory;
+     public SelectedGunInventory gunventory;
 
-    [SerializeField]
-    private GameObject gun_SlotsParent;
-    
-    private GunSlot[] gun_slot;
-    private bulletTest bullet_change;
+    [SerializeField] private GameObject gunSlotsParent;
 
-    // Start is called before the first frame update
+    private GunSlot[] gunSlots;
+    private bulletTest bulletChanger;
+
+    private GunSlot currentSlot; // 현재 선택된 슬롯 캐싱
+
     void Start()
     {
         gunventory = GameObject.FindObjectOfType<SelectedGunInventory>();
-        gun_SlotsParent = gunventory.gun_SlotsParent;
-        gun_slot = gun_SlotsParent.GetComponentsInChildren<GunSlot>();
-        bullet_change = GameObject.FindObjectOfType<bulletTest>();
+        gunSlotsParent = gunventory.gun_SlotsParent;
 
+        gunSlots = gunSlotsParent.GetComponentsInChildren<GunSlot>();
+        bulletChanger = GameObject.FindObjectOfType<bulletTest>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Slot_Renew();
+        UpdateSelectedSlot();
     }
 
-    void Slot_Renew()
+    private void UpdateSelectedSlot()
     {
-        for (int i = 0; i < gun_slot.Length; i++)
-        {
-            
-            if (gun_slot[i].activated_ == true && gun_slot[i].gun != null)//버튼 활성화 된 곳에 아이템이 있다면 그 자리 프리팹으로 바꺼줌
-            {
-                bullet_change.bullet_changer_test(gun_slot[i].gun);
-            }
-            if (gun_slot[i].activated_ == true && gun_slot[i].gun == null)//버튼은 눌렸는데 그 자리에 아이템이 없음(무슨 이유든)
-            {
-                gun_slot[i].transform.Find("select_Activate").gameObject.SetActive(false);
-                bullet_change.bullet_changer_test(null);
-                gun_slot[i].activated_ = false;
-            }
-            
-        }
+        GunSlot activeSlot = GetActiveSlot();
+
+        // 선택된 슬롯이 바뀌지 않았다면 아무것도 하지 않음
+        if (activeSlot == currentSlot) return;
+
+        currentSlot = activeSlot;
+
+        ApplyGun(currentSlot);
     }
 
+    private GunSlot GetActiveSlot()
+    {
+        for (int i = 0; i < gunSlots.Length; i++)
+        {
+            if (gunSlots[i].activated_)
+                return gunSlots[i];
+        }
+
+        return null;
+    }
+
+    private void ApplyGun(GunSlot slot)
+    {
+        if (slot == null || slot.gun == null)
+        {
+            ClearSlot(slot);
+            bulletChanger.bullet_changer_test(null);
+            return;
+        }
+
+        bulletChanger.bullet_changer_test(slot.gun);
+    }
+
+    private void ClearSlot(GunSlot slot)
+    {
+        if (slot == null) return;
+
+        Transform select = slot.transform.Find("select_Activate");
+        if (select != null)
+            select.gameObject.SetActive(false);
+
+        slot.activated_ = false;
+    }
 }
