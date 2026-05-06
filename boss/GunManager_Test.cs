@@ -12,7 +12,6 @@ public class GunManager_Test : MonoBehaviour
     private GunSlot[] gun_slot;
     private bulletTest bullet_change;
 
-    // Start is called before the first frame update
     void Start()
     {
         gunventory = GameObject.FindObjectOfType<SelectedGunInventory>();
@@ -22,7 +21,6 @@ public class GunManager_Test : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
         Slot_Renew();
