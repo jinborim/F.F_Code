@@ -6,7 +6,6 @@ public class Character_Maintain : MonoBehaviour
 {
     public static Character_Maintain Instance;
 
-    //public Color TeamColor;
     private void Awake()
     {
         if (Instance != null)
