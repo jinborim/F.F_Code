@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-     public Item item;
+    public Item item;
     public GunType_selected gun;
 
     [SerializeField] private Image gunImage;
@@ -26,7 +26,9 @@ public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBegin
 
     public static bool isDrop;
 
-     private void Awake()
+    #region Unity
+
+    private void Awake()
     {
         gunSlots = gunSlotsParent.GetComponentsInChildren<GunSlot>();
         topSlots = topSlotsParent.GetComponentsInChildren<TopSlot>();
@@ -37,6 +39,10 @@ public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBegin
         SetSelected(false);
         isDrop = false;
     }
+
+    #endregion
+
+    #region Click
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -49,7 +55,6 @@ public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBegin
         bulletChanger.bullet_changer_test(null);
         activated_ = false;
     }
-    
 
     private void ReturnToTopSlot()
     {
@@ -61,7 +66,12 @@ public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBegin
             break;
         }
     }
-public void OnBeginDrag(PointerEventData eventData)
+
+    #endregion
+
+    #region Drag
+
+    public void OnBeginDrag(PointerEventData eventData)
     {
         if (gun == null) return;
 
@@ -93,22 +103,50 @@ public void OnBeginDrag(PointerEventData eventData)
         SwapSlot(GunDragSlot.Instance.dragSlot);
     }
 
+    #endregion
+
+    #region Slot Logic
+
+    public void AddGun(Item newItem, GunType_selected newGun)
+    {
+        item = newItem;
+
+        GunSlot sameTypeSlot = FindSameTypeSlot(newGun);
+
+        if (sameTypeSlot != null)
+        {
+            sameTypeSlot.ClearSlot();
+        }
+
+        ApplyGun(newItem, newGun);
+
+        if (activated_)
+        {
+            bulletChanger.bullet_changer_test(newGun);
+        }
+    }
+
+    private GunSlot FindSameTypeSlot(GunType_selected newGun)
+    {
+        foreach (var slot in gunSlots)
+        {
+            if (slot.gun == null) continue;
+            if (slot.gun.gun_Type == newGun.gun_Type)
+                return slot;
+        }
+
+        return null;
+    }
+
     private void ApplyGun(Item newItem, GunType_selected newGun)
     {
-    item = newItem;
-    gun = newGun;
+        item = newItem;
+        gun = newGun;
 
-    if (newGun != null)
-    {
         gunImage.sprite = newGun.BulletImage;
         SetAlpha(1f);
     }
-    else
-    {
-        gunImage.sprite = null;
-        SetAlpha(0f);
-    }
-    }
+
     public void ClearSlot()
     {
         item = null;
@@ -153,4 +191,5 @@ public void OnBeginDrag(PointerEventData eventData)
             select.gameObject.SetActive(value);
     }
 
+    #endregion
 }
