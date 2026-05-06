@@ -7,30 +7,23 @@ public class Item_Test : MonoBehaviour
     [SerializeField]
     private Inventory theInventory;
 
-    /*[SerializeField]
-    private SelectedGunInventory gunInventory;*/
-
-    //private ItemPickUp itempickup;
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Item")|| collision.gameObject.CompareTag("Gun"))
-        {
-            theInventory.AcquireItem(collision.transform.GetComponent<ItemPickUp>().item, collision.transform.GetComponent<ItemPickUp>().gun);
-            //gunInventory.AddGunSlot(collision.transform.GetComponent<ItemPickUp>().item, collision.transform.GetComponent<ItemPickUp>().gun);
-        }
-    }
-            
+        // Item / Gun 둘 다 처리
+        if (!collision.CompareTag("Item") && !collision.CompareTag("Gun"))
+            return;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+        // ItemPickUp은 항상 존재한다는 전제지만, 구조적으로 안전하게 1번만 가져옴
+        ItemPickUp pickup = collision.GetComponent<ItemPickUp>();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (pickup == null)
+            return;
+
+        // 인벤토리에 아이템 전달
+        theInventory.AcquireItem(pickup.item, pickup.gun);
+
+        // 아이템 먹었으면 제거
+        collision.gameObject.SetActive(false);
+        // Destroy(collision.gameObject);
     }
 }
