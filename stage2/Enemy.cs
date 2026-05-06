@@ -4,56 +4,39 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float speed;
+  [SerializeField] private float speed;
 
-    bool isLeft = true;
- 
-    // Start is called before the first frame update
+    private bool isMovingLeft = true;
+
     void Start()
     {
-        speed = Random.Range(2, 6);
+        speed = Random.Range(2f, 6f);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (Inventory.invectoryActivated == false)
-        {
-            transform.Translate(Vector2.left * speed * Time.deltaTime);
-        }
-        
+        if (Inventory.invectoryActivated) return;
+
+        Move();
     }
-    private void OnTriggerEnter2D(Collider2D collision)
+
+    private void Move()
     {
-        if (collision.gameObject.CompareTag("endpoint"))
-        {
-            if (isLeft)
-            {
-                transform.eulerAngles = new Vector3(0, 180, 0);
-                isLeft = false;
-            }
-            else
-            {
-                transform.eulerAngles = new Vector3(0, 0, 0);
-                isLeft = true;
-            }
-        }
+        transform.Translate(Vector2.left * speed * Time.deltaTime);
+    }
+
+    private void TurnAround()
+    {
+        isMovingLeft = !isMovingLeft;
+
+        float yRotation = isMovingLeft ? 0f : 180f;
+        transform.eulerAngles = new Vector3(0f, yRotation, 0f);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("endpoint"))
-        {
-            if (isLeft)
-            {
-                transform.eulerAngles = new Vector3(0, 180, 0);
-                isLeft = false;
-            }
-            else
-            {
-                transform.eulerAngles = new Vector3(0, 0, 0);
-                isLeft = true;
-            }
-        }
+        if (!collision.gameObject.CompareTag("endpoint")) return;
+
+        TurnAround();
     }
 }
