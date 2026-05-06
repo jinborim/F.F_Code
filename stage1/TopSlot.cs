@@ -27,8 +27,6 @@ public class TopSlot : MonoBehaviour,
 
     private bool isDragging = false;
 
-    #region Init
-
     private void Start()
     {
         inventory = FindObjectOfType<Inventory>();
@@ -46,10 +44,6 @@ public class TopSlot : MonoBehaviour,
             if (t != null) t.gameObject.SetActive(false);
         }
     }
-
-    #endregion
-
-    #region Pointer Events
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -69,10 +63,6 @@ public class TopSlot : MonoBehaviour,
         ReturnToGunSlot();
         ClearSlot();
     }
-
-    #endregion
-
-    #region Drag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -110,10 +100,6 @@ public class TopSlot : MonoBehaviour,
         SwapSlot(TopDragSlot.instance.dragSlot);
     }
 
-    #endregion
-
-    #region Core Logic
-
     private void SwapSlot(TopSlot from)
     {
         if (from == null) return;
@@ -149,9 +135,6 @@ public class TopSlot : MonoBehaviour,
         }
     }
 
-    #endregion
-
-    #region Slot Control
 
     public void AddItem(Item _item, GunType_selected _gun, int _count = 1)
     {
@@ -194,10 +177,6 @@ public class TopSlot : MonoBehaviour,
         SetColor(0);
     }
 
-    #endregion
-
-    #region UI
-
     private void SetHighlight(bool active)
     {
         if (parentTransform == null) return;
@@ -215,6 +194,4 @@ public class TopSlot : MonoBehaviour,
         c.a = alpha;
         itemImage.color = c;
     }
-
-    #endregion
 }
