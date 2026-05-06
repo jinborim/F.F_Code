@@ -11,7 +11,7 @@ public class MonsterMovement : MonoBehaviour
     public float speed = 2f;
     public int M_healtㅗ;
 
-   public bool is_endpoint; 
+    public bool is_endpoint; 
     public HP_Manager hp_manger; 
 
     public Monster monster_; 
