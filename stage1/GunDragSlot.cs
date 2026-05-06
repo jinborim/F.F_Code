@@ -6,27 +6,45 @@ using UnityEngine.UI;
 
 public class GunDragSlot : MonoBehaviour
 {
-    static public GunDragSlot instance;
+   public static GunDragSlot Instance;
+
     public GunSlot dragSlot;
 
-    [SerializeField]
-    public Image imagegun;
+    [SerializeField] private Image dragImage;
 
-    void Start()
+    private void Awake()
     {
-        instance = this;
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
     }
 
-    public void DragSetImage(Image _itemImage)
+    public void SetDragImage(Image sourceImage)
     {
-        imagegun.sprite = _itemImage.sprite;
-        SetColor(1);
+        if (sourceImage == null || dragImage == null) return;
+
+        dragImage.sprite = sourceImage.sprite;
+        SetAlpha(1f);
     }
 
-    public void SetColor(float _alpha)
+    public void SetAlpha(float alpha)
     {
-        Color color = imagegun.color;
-        color.a = _alpha;
-        imagegun.color = color;
+        if (dragImage == null) return;
+
+        Color color = dragImage.color;
+        color.a = alpha;
+        dragImage.color = color;
+    }
+
+    public void Clear()
+    {
+        if (dragImage == null) return;
+
+        dragImage.sprite = null;
+        SetAlpha(0f);
     }
 }
