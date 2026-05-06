@@ -30,10 +30,11 @@ public class CameraController : MonoBehaviour
 
     public void Character_movement()
     {
-        targetPosition.Set(target.transform.position.x, target.transform.position.y, this.transform.position.z);
+      if(target == null) return;
 
-        this.transform.position = Vector3.Lerp(this.transform.position, targetPosition, moveSpeed * Time.deltaTime);
-        
+      targetPosition = new Vector3(target.transform.position.x, target.transform.y, transform.position.z);
+
+      transform.position =  Vector3.Lerp(transform.position, targetPosition, movwSpeed * Time.deltaTime);        
     }
 
     public IEnumerator Fixed_Boss()
