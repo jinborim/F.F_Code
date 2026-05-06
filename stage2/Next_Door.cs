@@ -1,78 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class MonsterMovement : MonoBehaviour
+public class Next_Door : MonoBehaviour
 {
+    public string SceneName; 
 
-    private Rigidbody2D monsterRd;
-    public int nextMove; 
-    public float speed = 2f;
-    public int M_healtㅗ;
+    private Door_Test door;
+    public Select_Yes selected;
 
-   public bool is_endpoint; 
-    public HP_Manager hp_manger; 
+    public bool is_Enter = false; 
+    public string[] Door_dialogue = new string[]{"다음 스테이지로 이동할까?"};
 
-    public Monster monster_; 
-    public CharacterMovement character; 
-    public Boss_Movement Boss; 
 
-    private void Awake()
+   void Start()
     {
-        monsterRd = GetComponent<Rigidbody2D>();
-    }
+        door = GameObject.FindObjectOfType<Door_Test>();
 
-    private void Start()
-    {
-        is_endpoint = false;
-        
-        hp_manger = GameObject.FindObjectOfType<HP_Manager>();
-        character = GameObject.FindObjectOfType<CharacterMovement>();
-        Boss = GameObject.FindObjectOfType<Boss_Movement>();
-
-        if (monster_ != null)
+        if (door != null)
         {
-            M_health = monster_.M_health;
+            selected = door.select_.GetComponentInChildren<Select_Yes>();
         }
-    }
-
-     private void OnCollisionEnter2D(Collision2D collision)
-    {
-        HandleDamage(collision.gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        HandleDamage(collision.gameObject);
+        if (!collision.CompareTag("Character"))
+            return;
+
+        is_Enter = true;
+
+        if (selected != null)
+            selected.GetSceneName(SceneName);
+
+        if (door != null)
+            door.Get_Dialogue(is_Enter, Door_dialogue, true);
     }
 
-    private void HandleDamage(GameObject target)
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!target.CompareTag("Character"))
+        if (!collision.CompareTag("Character"))
             return;
 
-        if (character == null || character.is_Beat)
-            return;
+        is_Enter = false;
 
-        if (hp_manager == null || monster_ == null)
-            return;
-
-        hp_manager.Damaged(monster_.damage);
-    }
-
-    public void health_manager(int damage)
-    {
-        M_health -= damage;
-
-        if (M_health <= 0)
-        {
-            if (Boss != null)
-            {
-                Boss.Rest_count -= 1;
-            }
-
-            Destroy(gameObject);
-        }
+        if (door != null)
+            door.Get_Dialogue(false, null, false);
     }
 }
