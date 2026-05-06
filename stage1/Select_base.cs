@@ -12,11 +12,9 @@ public class Select_base : MonoBehaviour
 
     private SelectPanel[] selectPanel_ar;
 
-    // Start is called before the first frame update
     void Start()
     {
         selectPanel_ar = select_base_obj.GetComponentsInChildren<SelectPanel>();
-        //this.transform.gameObject.SetActive(false);
     }
     private void Awake()
     {
