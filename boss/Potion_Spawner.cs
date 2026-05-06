@@ -17,13 +17,26 @@ public class Potion_Spawner : MonoBehaviour
     public int potionCount = 0;
 
 
-    // Start is called before the first frame update
     void Start()
     {
         this.gameObject.SetActive(false);
         Spawner1.Set(146, 2, 0);
         Spawner2.Set(156, 0, 0);
         Spawner3.Set(166, 2, 0);
+    }
+
+       void Update()
+    {
+        delta += Time.deltaTime;
+        if (delta > interval)
+        {
+            if(potionCount == 0)
+            {
+                delta = 0;
+                SpawnerChange();
+            }
+            
+        }
     }
 
     void SpawnerChange()
@@ -52,20 +65,5 @@ public class Potion_Spawner : MonoBehaviour
     {
         int j = Random.Range(0, Potions.Length);
         potion = Potions[j];
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        delta += Time.deltaTime;
-        if (delta > interval)
-        {
-            if(potionCount == 0)
-            {
-                delta = 0;
-                SpawnerChange();
-            }
-            
-        }
     }
 }
