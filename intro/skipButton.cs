@@ -12,7 +12,6 @@ public class skipButton : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            //SceneManager.LoadScene(stage.sceneNow);
             LoadSceneManager.LoadScene("stage1");
         }
     }
