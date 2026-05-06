@@ -64,15 +64,12 @@ public class Select_No : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
         }
     }
 
-
-
-    // Start is called before the first frame update
     void Start()
     {
         Panel_Img = transform.GetComponent<Image>();
-        //Panel_Img.color = color_;
+
     }
 
-    // Update is called once per frame
+
 
 }
