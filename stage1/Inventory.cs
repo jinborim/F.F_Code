@@ -5,8 +5,7 @@ using UnityEngine;
 public class Inventory : MonoBehaviour
 {
     public static Inventory Instance;
-
-    public static bool inventoryActivated = false;
+    public static bool invectoryActivated;
 
     [SerializeField] private GameObject inventoryBase;
     [SerializeField] private GameObject slotsParent;
@@ -17,13 +16,6 @@ public class Inventory : MonoBehaviour
 
     private void Awake()
     {
-        // 싱글톤
-        if (Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         Instance = this;
     }
 
@@ -37,75 +29,52 @@ public class Inventory : MonoBehaviour
 
     void Update()
     {
-        ToggleInventoryInput();
-    }
-
-    #region Inventory Toggle
-
-    private void ToggleInventoryInput()
-    {
         if (Input.GetKeyDown(KeyCode.I))
         {
-            ToggleInventory();
+            invectoryActivated = !invectoryActivated;
+            inventoryBase.SetActive(invectoryActivated);
         }
     }
-
-    public void ToggleInventory()
-    {
-        inventoryActivated = !inventoryActivated;
-        inventoryBase.SetActive(inventoryActivated);
-    }
-
-    #endregion
-
-    #region Item Logic
 
     public void AcquireItem(Item item, GunType_selected gun, int count = 1)
     {
-        if (item.itemType == Item.ItemType.Equipment)
-        {
-            AddEquipment(item, gun, count);
-        }
-        else
-        {
-            AddItem(item, count);
-        }
-    }
+        if (item == null) return;
 
-    private void AddItem(Item item, int count)
-    {
-        // 기존 아이템 찾기 (스택)
-        foreach (var slot in slots)
+        // 장비가 아닌 경우 → stack 먼저
+        if (item.itemType != Item.ItemType.Equipment)
         {
-            if (slot.item != null && slot.item.itemName == item.itemName)
+            foreach (var slot in slots)
             {
-                slot.SetSlotCount(count);
-                return;
+                if (slot.item != null && slot.item.itemName == item.itemName)
+                {
+                    slot.SetSlotCount(count);
+                    return;
+                }
             }
         }
 
         // 빈 슬롯 찾기
-        foreach (var slot in slots)
+        if (item.itemType != Item.ItemType.Equipment)
         {
-            if (slot.item == null)
+            foreach (var slot in slots)
             {
-                slot.AddItem(item, count);
-                return;
+                if (slot.item == null)
+                {
+                    slot.AddItem(item, count);
+                    return;
+                }
+            }
+        }
+        else
+        {
+            foreach (var slot in topSlots)
+            {
+                if (slot.item == null)
+                {
+                    slot.AddItem(item, gun, count);
+                    return;
+                }
             }
         }
     }
-
-    private void AddEquipment(Item item, GunType_selected gun, int count)
-    {
-        foreach (var slot in topSlots)
-        {
-            if (slot.item == null)
-            {
-                slot.AddItem(item, gun, count);
-                return;
-            }
-        }
-    }
-
-    #endregion
 }
