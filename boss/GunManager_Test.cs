@@ -31,11 +31,11 @@ public class GunManager_Test : MonoBehaviour
         for (int i = 0; i < gun_slot.Length; i++)
         {
             
-            if (gun_slot[i].activated_ == true && gun_slot[i].gun != null)//버튼 활성화 된 곳에 아이템이 있다면 그 자리 프리팹으로 바꺼줌
+            if (gun_slot[i].activated_ == true && gun_slot[i].gun != null)
             {
                 bullet_change.bullet_changer_test(gun_slot[i].gun);
             }
-            if (gun_slot[i].activated_ == true && gun_slot[i].gun == null)//버튼은 눌렸는데 그 자리에 아이템이 없음(무슨 이유든)
+            if (gun_slot[i].activated_ == true && gun_slot[i].gun == null)
             {
                 gun_slot[i].transform.Find("select_Activate").gameObject.SetActive(false);
                 bullet_change.bullet_changer_test(null);
