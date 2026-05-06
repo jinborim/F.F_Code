@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 public class SetStartPoint : MonoBehaviour
 {
-    //public string startPoint;
     private GameObject thePlayer;
     public float Xpoint;
     public float Ypoint;
@@ -18,10 +17,6 @@ public class SetStartPoint : MonoBehaviour
             thePlayer = GameObject.Find("Character");
         }
             
-        /*if (startPoint == thePlayer.currentMapName)
-        {
-            thePlayer.transform.position = transform.position;
-        }*/
         thePlayer.transform.position = startpoint;
 
         if(Dialogue_Maintain.Instance.GetComponentInChildren<Dialog_Test>()&& Dialogue_Maintain.Instance.GetComponentInChildren<Select_base>()!= null)
@@ -29,7 +24,6 @@ public class SetStartPoint : MonoBehaviour
             Dialogue_Maintain.Instance.GetComponentInChildren<Dialog_Test>().gameObject.SetActive(false);
             Dialogue_Maintain.Instance.GetComponentInChildren<Select_base>().gameObject.SetActive(false);
         }
-        
-
+    
     }
 }
