@@ -6,5 +6,12 @@ public class Potion : MonoBehaviour
 {
     Potion_Spawner potionSpawner;
 
-   
+    void Start()
+    {
+        potionSpawner = GameObject.FindObjectOfType<Potion_Spawner>();
+        
+    }
+
+    
+
 }
