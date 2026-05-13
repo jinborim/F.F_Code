@@ -5,23 +5,28 @@ using UnityEngine.UI;
 
 public class npcChange : MonoBehaviour
 {
-     private Image img;
-    private RectTransform rect;
+    public Image img;
+    public Sprite after_img;
 
-    [SerializeField] private Sprite after_img;
+    public RectTransform rect;
 
+
+    // Start is called before the first frame update
     void Start()
     {
         img = GetComponent<Image>();
         rect = GetComponent<RectTransform>();
     }
 
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
     public void ChangeImage()
     {
-        if (img != null && after_img != null)
-            img.sprite = after_img;
-
-        if (rect != null)
-            rect.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        //img.sprite = after_img;
+        rect.eulerAngles= new Vector3(0,180,0);
     }
 }
