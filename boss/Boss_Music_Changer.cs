@@ -28,4 +28,16 @@ public class Boss_Music_Changer : MonoBehaviour
                 break;
         }
     }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        Audio_Source = GetComponent<AudioSource>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 }
