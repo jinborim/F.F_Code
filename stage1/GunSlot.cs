@@ -7,189 +7,255 @@ using UnityEngine.EventSystems;
 
 public class GunSlot : MonoBehaviour, IDropHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public Item item;
-    public GunType_selected gun;
+    public Item item; // 획득한 아이템
+    public int itemCount; // 획득한 아이템의 개수
+    public Image itemImage;  // 아이템의 이미지
 
-    [SerializeField] private Image gunImage;
+    //private GunSlot[] gunslot;
+    public GunType_selected gun; // 획득한 무기
+    //public int itemCount; // 획득한 아이템의 개수
+    public Image gunImage;  // 아이템의 이미지
+    public GameObject selected_bulletPrefab;
+    public GunType_selected.Gun_Type gunType_;
+    //private keycode_selector key_selector;
 
-    [SerializeField] private GameObject gunSlotsParent;
-    [SerializeField] private GameObject topSlotsParent;
+    [SerializeField]
+    private GameObject gun_SlotsParent;
+    private GunSlot[] Gun_slot;
 
-    private GunSlot[] gunSlots;
-    private TopSlot[] topSlots;
+    private GunSlot gun_slot;
+   
+    private bulletTest bullet_change;
 
-    private bulletTest bulletChanger;
-    private keycode_selector keySelector;
 
+    [SerializeField]
+    private GameObject top_SlotsParent;
+    
+    private TopSlot[] top_slot;
+
+    private keycode_selector key_selector;
+    public static bool is_drop = false;
+    public bool dropped_slot = false;
     public bool activated_;
-    public bool droppedSlot;
 
-    public static bool isDrop;
-
-    #region Unity
-
-    private void Awake()
-    {
-        gunSlots = gunSlotsParent.GetComponentsInChildren<GunSlot>();
-        topSlots = topSlotsParent.GetComponentsInChildren<TopSlot>();
-
-        bulletChanger = GameObject.FindObjectOfType<bulletTest>();
-        keySelector = GameObject.FindObjectOfType<keycode_selector>();
-
-        SetSelected(false);
-        isDrop = false;
-    }
-
-    #endregion
-
-    #region Click
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button != PointerEventData.InputButton.Right) return;
-        if (gun == null) return;
-
-        ReturnToTopSlot();
-        ClearSlot();
-
-        bulletChanger.bullet_changer_test(null);
-        activated_ = false;
-    }
-
-    private void ReturnToTopSlot()
-    {
-        foreach (var slot in topSlots)
+        if (item != null && gun != null)
         {
-            if (slot.item != null) continue;
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                //Debug.Log(transform.GetComponent<GunSlot>().item);
+                //우클릭 시 해당 슬롯의 아이템을 도로 topslot에 갖다놓음.
+                for (int i = 0; i < top_slot.Length; i++)
+                {
+                    if (top_slot[i].item == null)
+                    {
+                        top_slot[i].AddItem(transform.GetComponent<GunSlot>().item, transform.GetComponent<GunSlot>().gun);
+                        break;
+                        //return;
+                    }
+                }
 
-            slot.AddItem(item, gun);
-            break;
+                //오른쪽 마우스를 클릭하면 해당 슬롯의 모든 gun정보와 프리팹과 활성화 상태 해제
+                this.ClearGunSlot();
+                transform.Find("select_Activate").gameObject.SetActive(false);
+                bullet_change.bullet_changer_test(null);
+                this.activated_ = false;
+
+
+
+            }
         }
+        
     }
 
-    #endregion
 
-    #region Drag
+
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (gun == null) return;
-
-        GunDragSlot.Instance.dragSlot = this;
-        GunDragSlot.Instance.SetDragImage(gunImage);
-        GunDragSlot.Instance.transform.position = eventData.position;
+        if (gun != null)
+        {
+            //this.transform.Find("select_Activate").gameObject.SetActive(false);
+            
+            GunDragSlot.instance.dragSlot = this;
+            GunDragSlot.instance.DragSetImage(gunImage);
+            GunDragSlot.instance.transform.position = eventData.position;
+            
+        }
     }
 
+    // 마우스 드래그 중일 때 계속 발생하는 이벤트
     public void OnDrag(PointerEventData eventData)
     {
-        if (gun == null) return;
 
-        GunDragSlot.Instance.transform.position = eventData.position;
+        if (gun != null)
+        {
+
+            GunDragSlot.instance.transform.position = eventData.position;
+            //Debug.Log("onDrag");
+
+
+        }
+
     }
 
+    // 마우스 드래그가 끝났을 때 발생하는 이벤트
     public void OnEndDrag(PointerEventData eventData)
     {
-        GunDragSlot.Instance.SetAlpha(0f);
-        GunDragSlot.Instance.dragSlot = null;
+        
+        GunDragSlot.instance.SetColor(0);
+        GunDragSlot.instance.dragSlot = null;
+  
     }
 
     public void OnDrop(PointerEventData eventData)
     {
-        if (GunDragSlot.Instance.dragSlot == null) return;
+        
+        is_drop = true;
+        this.dropped_slot = true;
+        
+        
 
-        isDrop = true;
-        droppedSlot = true;
-
-        SwapSlot(GunDragSlot.Instance.dragSlot);
-    }
-
-    #endregion
-
-    #region Slot Logic
-
-    public void AddGun(Item newItem, GunType_selected newGun)
-    {
-        item = newItem;
-
-        GunSlot sameTypeSlot = FindSameTypeSlot(newGun);
-
-        if (sameTypeSlot != null)
+        if (GunDragSlot.instance.dragSlot != null)
         {
-            sameTypeSlot.ClearSlot();
+            ChangeSlot();
+            //bullet_change.bullet_changer_test(this.gun);//바꾼 자리가 활성화되어있다면...
         }
+        
+    }
 
-        ApplyGun(newItem, newGun);
 
-        if (activated_)
+    private void Awake()
+    {
+        activated_ = false;
+        //key_selector = GameObject.FindObjectOfType<keycode_selector>();
+        transform.Find("select_Activate").gameObject.SetActive(false);
+        Gun_slot = gun_SlotsParent.GetComponentsInChildren<GunSlot>();
+        top_slot = top_SlotsParent.GetComponentsInChildren<TopSlot>();
+        bullet_change = GameObject.FindObjectOfType<bulletTest>();
+        key_selector = GameObject.FindObjectOfType<keycode_selector>();
+        is_drop = false;
+
+    }
+
+    private void Update()
+    {
+        
+    }
+
+    public void Gunslot_Renew()
+    {
+        for(int i=0; i<Gun_slot.Length; i++)
         {
-            bulletChanger.bullet_changer_test(newGun);
+            if ((Gun_slot[i].activated_ == true)&&Gun_slot[i].gun==null)
+            {
+                Gun_slot[i].transform.Find("select_Activate").gameObject.SetActive(false);
+                bullet_change.bullet_changer_test(null);
+            }
         }
     }
 
-    private GunSlot FindSameTypeSlot(GunType_selected newGun)
+
+
+    public void AddGun(Item _item, GunType_selected _gun)
     {
-        foreach (var slot in gunSlots)
+        item = _item;
+        //itemImage.sprite = item.itemImage;
+
+        for (int i = 0; i < Gun_slot.Length; i++)
         {
-            if (slot.gun == null) continue;
-            if (slot.gun.gun_Type == newGun.gun_Type)
-                return slot;
+            if (Gun_slot[i].gun != null && (Gun_slot[i].gunType_ == _gun.gun_Type))
+            {
+                //비어있지 않은 슬롯에 있는 gunType이 새로 저장할 gun의 gunType과 같을 때 : 원래 있던 부분을 지우고 새로운 gun을 드롭된 자리에 만듦
+                Gun_slot[i].ClearGunSlot();
+                GunChange(_item,_gun);
+                if (Gun_slot[i].activated_ == true&&Gun_slot[i].gun!=null) //
+                {
+                    bullet_change.bullet_changer_test(_gun);
+                }
+                
+
+            }
+            else if (Gun_slot[i].gun != null && (Gun_slot[i].gunType_ != _gun.gun_Type))
+            {
+                //비어있지 않은 슬롯에 있는 gunType이 새로 저장할 gun과 다를 때: 그냥 추가
+                GunChange(_item, _gun);
+
+                
+            }
+
+
+            else
+            {
+                //비어있는 슬롯의 경우: 그냥 추가
+                GunChange(_item, _gun);
+                
+            }
+
+            
+
         }
+        return;
 
-        return null;
     }
 
-    private void ApplyGun(Item newItem, GunType_selected newGun)
+    public void GunChange(Item _item, GunType_selected _gun)
     {
-        item = newItem;
-        gun = newGun;
+        item = _item;
+        //itemCount = _count;
+        //itemImage.sprite = item.itemImage;
 
-        gunImage.sprite = newGun.BulletImage;
-        SetAlpha(1f);
+        //해당 슬롯의 총에 대한 정보를 전부 바꿔준다
+        gun = _gun;
+        gunImage.sprite = gun.BulletImage;
+        selected_bulletPrefab = gun.BulletPrefab;
+        gunType_ = gun.gun_Type;
+
+        SetColor(1);
     }
 
-    public void ClearSlot()
-    {
-        item = null;
-        gun = null;
-
-        gunImage.sprite = null;
-        SetAlpha(0f);
-
-        SetSelected(false);
-    }
-
-    private void SwapSlot(GunSlot from)
-    {
-        Item tempItem = item;
-        GunType_selected tempGun = gun;
-
-        ApplyGun(from.item, from.gun);
-
-        if (tempGun != null)
-            from.ApplyGun(tempItem, tempGun);
-        else
-            from.ClearSlot();
-    }
-
-    #endregion
-
-    #region UI
-
-    private void SetAlpha(float alpha)
+    private void SetColor(float _alpha)
     {
         Color color = gunImage.color;
-        color.a = alpha;
+        color.a = _alpha;
         gunImage.color = color;
     }
 
-    private void SetSelected(bool value)
+    public void ClearGunSlot()
     {
-        activated_ = value;
-
-        Transform select = transform.Find("select_Activate");
-        if (select != null)
-            select.gameObject.SetActive(value);
+        item = null;
+        //itemCount = 0;
+        //itemImage.sprite = null;
+        //SetColor(0);
+        //Debug.Log("clearGunSlot");
+        gun = null;
+        gunImage.sprite = null;
+        selected_bulletPrefab = null;
+        gunType_ = 0;
+        SetColor(0);
     }
 
-    #endregion
+    private void ChangeSlot()
+    {
+        Item _tempItem = item;
+        GunType_selected _tempgun = gun;
+
+        GunChange(GunDragSlot.instance.dragSlot.item, GunDragSlot.instance.dragSlot.gun);
+
+        if (_tempgun != null)
+        {
+            GunDragSlot.instance.dragSlot.GunChange(_tempItem,_tempgun);
+            
+
+        }
+
+        else
+        {
+            GunDragSlot.instance.dragSlot.ClearGunSlot();
+        }
+            
+    }
+
 }
