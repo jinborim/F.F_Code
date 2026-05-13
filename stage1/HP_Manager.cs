@@ -5,104 +5,123 @@ using UnityEngine.UI;
 
 public class HP_Manager : MonoBehaviour
 {
-   public HP_Heart[] hearts;
+    public static int hp;
+    public float Full_Health = 100;
+    public float Health = 100;
+    public float Rest = 0;
+
+
+    public GameObject Hp_parent;
+
+    public HP_Heart[] life;
+
     public CharacterMovement character;
 
-    private void Start()
+
+    void Start()
     {
-        hearts = GetComponentsInChildren<HP_Heart>();
-        character = FindObjectOfType<CharacterMovement>();
+        Hp_parent = this.transform.gameObject;
+        life = Hp_parent.GetComponentsInChildren<HP_Heart>();
+        character = GameObject.FindObjectOfType<CharacterMovement>();
     }
 
-    // 데미지 처리
-    public void Damaged(int damage)
+    public void Damaged(int _damage)
     {
-        if (damage <= 0) return;
-
         character.is_Beat = true;
-
-        // 뒤에서부터 체력 차감
-        for (int i = hearts.Length - 1; i >= 0; i--)
+        for (int i = life.Length - 1; i >= 0; i--)
         {
-            if (damage <= 0) break;
-
-            int current = hearts[i].currentHealth;
-
-            if (current > 0)
+            if (life[i].Heart_Health > 0)
             {
-                if (current >= damage)
+                if (life[i].Heart_Health - _damage <= 0)
                 {
-                    hearts[i].SetHealth(current - damage);
-                    damage = 0;
+                    if (i != 0)
+                    {
+                        int Rest = _damage - life[i].Heart_Health;
+                        life[i].Heart_Health = 0;
+                        life[i - 1].Heart_Health -= Rest;
+                        break;
+                    }
+                    else if (i == 0)
+                    {
+                        life[i].Heart_Health = 0;
+                        //Debug.Log("사망");
+                        character.DIE();
+                    }
+
+
                 }
-                else
+                else if (life[i].Heart_Health - _damage > 0)
                 {
-                    damage -= current;
-                    hearts[i].SetHealth(0);
+                    life[i].Heart_Health -= _damage;
+                    break;
                 }
             }
+            else if (life[i].Heart_Health == 0)
+            {
+                continue;
+            }
+
         }
 
-        UpdateAllUI();
-
-        if (IsDead())
+        for (int i = 0; i < life.Length; i++)
         {
-            character.DIE();
-            return;
+            Health_Status(i, life[i].Heart_Health, "D");
         }
+
 
         StartCoroutine(character.OnBeatTime());
+
+
+
     }
 
-    // 회복 처리
-    public void Heal(int heal)
+    public void Heal(int _heal)
     {
-        if (heal <= 0) return;
-
-        // 앞에서부터 회복
-        for (int i = 0; i < hearts.Length; i++)
+        for (int i = 0; i < life.Length; i++)
         {
-            if (heal <= 0) break;
-
-            int current = hearts[i].currentHealth;
-
-            if (current < hearts[i].maxHealth)
+            if (life[i].Heart_Health < 100)
             {
-                int need = hearts[i].maxHealth - current;
-
-                if (heal >= need)
+                if (life[i].Heart_Health + _heal >= 100)
                 {
-                    hearts[i].SetHealth(hearts[i].maxHealth);
-                    heal -= need;
+                    if (i != life.Length - 1)
+                    {
+                        int Rest = (life[i].Heart_Health + _heal) - 100;
+                        life[i].Heart_Health = 100;
+                        life[i + 1].Heart_Health += Rest;
+                        break;
+                    }
+                    else if (i == life.Length - 1)
+                    {
+                        life[i].Heart_Health = 100;
+                        break;
+                    }
                 }
-                else
+                else if (life[i].Heart_Health + _heal < 100)
                 {
-                    hearts[i].SetHealth(current + heal);
-                    heal = 0;
+                    life[i].Heart_Health += _heal;
+                    break;
                 }
+            }
+            else if (life[i].Heart_Health == 100)
+            {
+                continue;
             }
         }
 
-        UpdateAllUI();
+        for (int i = 0; i < life.Length; i++)
+        {
+            Health_Status(i, life[i].Heart_Health, "H");
+        }
+
+
+
+
     }
 
-    // 사망 체크
-    private bool IsDead()
+
+    public void Health_Status(int index, float health, string _what) //what은 D랑 H으로 데미지인지 회복인지 구분할거임
     {
-        for (int i = 0; i < hearts.Length; i++)
-        {
-            if (hearts[i].currentHealth > 0)
-                return false;
-        }
-        return true;
+        life[index].hp_Heart.fillAmount = (health / Full_Health);
     }
 
-    // UI 전체 갱신
-    private void UpdateAllUI()
-    {
-        for (int i = 0; i < hearts.Length; i++)
-        {
-            hearts[i].SetHealth(hearts[i].currentHealth);
-        }
-    }
 }
