@@ -5,17 +5,19 @@ using UnityEngine.UI;
 
 public class CanvasMaintain_Test : MonoBehaviour
 {
- public static CanvasMaintain_Test Instance { get; private set; }
+    public static CanvasMaintain_Test Instance;
+    
 
+    //public Color TeamColor;
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        
     }
 }
