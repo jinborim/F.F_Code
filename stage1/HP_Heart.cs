@@ -4,39 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class HP_Heart : MonoBehaviour
-{ 
-    [SerializeField] private Image hpHeart;
+{
+    public GameObject hp_heart;
+    public Image hp_Heart;
+    public float filled_amount;
+    public int Heart_Health = 100;
 
-    public int maxHealth = 100;
-    public int currentHealth;
-
-    private void Awake()
-    {
-        currentHealth = maxHealth;
-    }
-
+    // Start is called before the first frame update
     void Start()
     {
-        if (hpHeart == null)
-            hpHeart = GetComponent<Image>();
-
-        UpdateUI();
+        hp_heart = this.gameObject;
+        hp_Heart = hp_heart.GetComponent<Image>();
+        //filled_amount = hp_Heart.fillAmount;
+    }
+    private void Awake()
+    {
+        //hp_heart.GetComponent<Image>().enabled = true;
+        Heart_Health = 100;
     }
 
-    public void TakeDamage(int damage)
+    // Update is called once per frame
+    void Update()
     {
-        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
-        UpdateUI();
-    }
-
-    public void Heal(int amount)
-    {
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-        UpdateUI();
-    }
-
-    private void UpdateUI()
-    {
-        hpHeart.fillAmount = (float)currentHealth / maxHealth;
+        
     }
 }
