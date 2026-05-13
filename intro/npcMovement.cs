@@ -4,44 +4,50 @@ using UnityEngine;
 
 public class npcMovement : MonoBehaviour
 {
-  public TalkText ttext;
-    public GameManager manager;
-
+    public TalkText ttext;
     private Vector3 target;
-
-    [SerializeField] private float moveSpeed = 2f;
+    //Vector2 target = new Vector2(500, 88);
+    public GameManager manager;
 
     void Start()
     {
-        manager = FindObjectOfType<GameManager>();
-        ttext = FindObjectOfType<TalkText>();
+        manager = GameObject.FindObjectOfType<GameManager>();
+        target.Set(500, 88, this.transform.position.z);
+    }
 
-        target = new Vector3(500f, 88f, transform.position.z);
+    void Update()
+    {
+        
     }
 
     public IEnumerator Scene44(bool scene4)
     {
-        if (!scene4) yield break;
-
-        while (Vector3.Distance(transform.position, target) > 0.05f)
+        do
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                target,
-                moveSpeed * Time.deltaTime
-            );
+            transform.position = Vector3.MoveTowards(transform.position, target, 2f);
+            yield return new WaitForSeconds(0.01f);
 
-            yield return null;
-        }
+        } while (this.transform.position != target) ;
 
-        transform.position = target;
+        this.transform.position = target;
 
-        if (manager != null)
+        if (scene4 == true)
+        {
             manager.panel(true);
+            ttext = GameObject.FindObjectOfType<TalkText>();
 
-        yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.5f);
+        }
+        ttext.Scene55(true);
 
-        if (ttext != null)
-            ttext.Scene55(true);
+
+
     }
+    public void Call2()
+    {
+        
+        ttext.Scene55(true);
+
+    }
+
 }
