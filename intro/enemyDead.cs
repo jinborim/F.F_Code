@@ -4,16 +4,35 @@ using UnityEngine;
 
 public class enemyDead : MonoBehaviour
 {
-    private PlayerMovement player;
+    public GameObject enemy;
+    public PlayerMovement player;
+
+    public float delta = 0;
+    public float interval = 2.5f;
+
 
     void Start()
     {
-        player = FindObjectOfType<PlayerMovement>();
+        player = GameObject.FindObjectOfType<PlayerMovement>();
+        
     }
+
+    // Update is called once per frame
+    void Update()
+    {
+        delta += Time.deltaTime;
+        
+    }
+
+    
 
     public void Call0()
     {
-        if (player != null)
-            StartCoroutine(player.Scene33(true));
+        StartCoroutine(player.Scene33(true));
     }
+
+    
+
 }
+
+    
