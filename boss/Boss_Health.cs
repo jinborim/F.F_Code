@@ -5,60 +5,46 @@ using UnityEngine.UI;
 
 public class Boss_Health : MonoBehaviour
 {
-    public float Full_Health = 150f;
-    public float Health = 150f;
+    public float Full_Health = 150;
+    public float Health = 150;
+    //¿ø·¡ Ã¼·ÂÀº 150
 
-    [SerializeField] private GameObject boss_health_parent;
-    [SerializeField] private Image healthBar;
+    public GameObject boss_health_parent;
+    public Image healthBar;
 
-    [SerializeField] private GameObject boss;
-    [SerializeField] private Boss_Movement boss_;
+    public GameObject boss;
 
+    public Boss_Movement boss_;
+
+
+    // Start is called before the first frame update
     void Start()
     {
-      if (boss_health_parent == null)
-            boss_health_parent = gameObject;
-
-        if (healthBar == null && boss_health_parent.transform.childCount > 0)
-        {
-            Transform uiRoot = boss_health_parent.transform.GetChild(0);
-            Transform hp = uiRoot.Find("BossHP");
-
-            if (hp != null)
-                healthBar = hp.GetComponentInChildren<Image>();
-        }
-
-        if (boss == null)
-            boss = GameObject.Find("Boss");
-
-        if (boss_ == null)
-            boss_ = FindObjectOfType<Boss_Movement>();
-
-        if (boss_health_parent.transform.childCount > 0)
-            boss_health_parent.transform.GetChild(0).gameObject.SetActive(false);
+        boss_health_parent = this.transform.gameObject;
+        healthBar = boss_health_parent.transform.GetChild(0).transform.Find("BossHP").GetComponentInChildren<Image>();
+        boss = GameObject.Find("Boss");
+        boss_ = GameObject.FindObjectOfType<Boss_Movement>();
+        boss_health_parent.transform.GetChild(0).gameObject.SetActive(false);
     }
 
     public void bossDamaged(int _damage)
     {
-   if (boss_ == null || healthBar == null) return;
-
         boss_.Boss_is_Beat = true;
-
-        if (Health <= _damage)
+        if (Health - _damage <= 0)
         {
-            Health = 0f;
+            Health = 0;
             boss_.BOSSDIE();
-            boss_health_parent.SetActive(false);
+            boss_health_parent.gameObject.SetActive(false);
         }
-        else
+        else if (Health - _damage > 0)
         {
             Health -= _damage;
-
             if (boss != null)
+            {
                 StartCoroutine(boss_.BossOnBeatTime());
+            }
         }
-
-        healthBar.fillAmount = Health / Full_Health;
+        healthBar.fillAmount = (Health / Full_Health);
         boss_.RestHealth = Health;
     }
 }
