@@ -7,7 +7,6 @@ public class Boss_Health : MonoBehaviour
 {
     public float Full_Health = 150;
     public float Health = 150;
-    //¿ø·¡ Ã¼·ÂÀº 150
 
     public GameObject boss_health_parent;
     public Image healthBar;
