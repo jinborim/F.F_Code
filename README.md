@@ -1,3 +1,5 @@
+플레이 영상 https://www.youtube.com/watch?v=SZ4O9bAiLio
+
 에셋 패키지 https://github.com/jinborim/F.F
 
 시스템 구조
