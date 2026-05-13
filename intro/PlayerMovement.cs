@@ -4,47 +4,46 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
- public npcMovement npc;
+
+    public npcMovement npc; 
+    private Vector3 target;
     public Animator ani;
 
-    private Vector3 target;
-
-    [SerializeField] private float moveSpeed = 2f;
 
     void Start()
     {
-        npc = FindObjectOfType<npcMovement>();
+        npc = GameObject.FindObjectOfType<npcMovement>();
+        target.Set(250, 88, this.transform.position.z);
         ani = GetComponent<Animator>();
+    }
 
-        target = new Vector3(250f, 88f, transform.position.z);
+    void Update()
+    {
+        
     }
 
     public IEnumerator Scene33(bool scene3)
     {
-        if (!scene3) yield break;
-
-        if (ani != null)
-            ani.SetTrigger("walkTest");
-
-        while (Vector3.Distance(transform.position, target) > 0.05f)
+        
+        do
         {
-            transform.position = Vector3.MoveTowards(
-                transform.position,
-                target,
-                moveSpeed * Time.deltaTime
-            );
+            ani.SetTrigger("walkTest");
+            transform.position = Vector3.MoveTowards(transform.position, target, 1.2f);
+            yield return new WaitForSeconds(0.01f);
 
-            yield return null;
-        }
+        } while (this.transform.position != target);
 
-        transform.position = target;
+        this.transform.position = target;
 
         Call1();
+
     }
 
     public void Call1()
     {
-        if (npc != null)
-            StartCoroutine(npc.Scene44(true));
+      
+        StartCoroutine(npc.Scene44(true));
     }
+
+
 }
