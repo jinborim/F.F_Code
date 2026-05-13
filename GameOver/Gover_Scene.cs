@@ -4,29 +4,33 @@ using UnityEngine;
 
 public class Gover_Scene : MonoBehaviour
 {
-    [SerializeField] public GameObject Status; // 부모 오브젝트 (Inspector에서 할당)
+    public GameObject Status;
     public GameObject[] Status_child;
-
+    // Start is called before the first frame update
     void Start()
     {
-     if (Status == null) return;
-
-        int childCount = Status.transform.childCount;
-        Status_child = new GameObject[childCount];
-
-        for (int i = 0; i < childCount; i++)
+        Status = GameObject.Find("STATUS");
+        Status_child = new GameObject[Status.transform.childCount];
+        for(int i=0; i < Status.transform.childCount; i++)
         {
             Status_child[i] = Status.transform.GetChild(i).gameObject;
         }
+        
     }
 
     public void ActiveFalse()
     {
-        if (Status_child == null) return;
-
         for (int i = 0; i < Status_child.Length; i++)
         {
-            Status_child[i].SetActive(false);
+            
+            Status_child[i].transform.gameObject.SetActive(false);
         }
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
