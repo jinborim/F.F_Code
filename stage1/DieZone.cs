@@ -13,4 +13,16 @@ public class DieZone : MonoBehaviour
             character.DIE();
         }
     }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        character = GameObject.FindObjectOfType<CharacterMovement>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 }
