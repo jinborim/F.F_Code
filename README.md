@@ -1,3 +1,5 @@
+에셋 패키지 https://github.com/jinborim/F.F
+
 시스템 구조
 1. Inventroy System
 - 아이템 획득 및 슬롯 관리
