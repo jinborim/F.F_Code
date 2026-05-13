@@ -5,74 +5,90 @@ using UnityEngine.SceneManagement;
 
 public class MonsterMovement : MonoBehaviour
 {
-
-    private Rigidbody2D monsterRd;
-    public int nextMove; 
+    Rigidbody2D monsterRd;
+    public int nextMove;
     public float speed = 2f;
-    public int M_healtㅗ;
+    public int M_health;
 
-   public bool is_endpoint; 
-    public HP_Manager hp_manger; 
+    public bool is_endpoint;
+    public HP_Manager hp_manger;
 
-    public Monster monster_; 
-    public CharacterMovement character; 
-    public Boss_Movement Boss; 
+    public Monster monster_;
+    public CharacterMovement character;
+    public Boss_Movement Boss;
 
-    private void Awake()
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        monsterRd = GetComponent<Rigidbody2D>();
-    }
-
-    private void Start()
-    {
-        is_endpoint = false;
-        
-        hp_manger = GameObject.FindObjectOfType<HP_Manager>();
-        character = GameObject.FindObjectOfType<CharacterMovement>();
-        Boss = GameObject.FindObjectOfType<Boss_Movement>();
-
-        if (monster_ != null)
+        //캐릭터는 기본적으로 isTrigger가 활성화되어있지 않기때문에 이 함수를 사용한다.
+        if (collision.gameObject.CompareTag("Character"))
         {
-            M_health = monster_.M_health;
-        }
-    }
+            if (character.is_Beat == false)
+            {
+                if (hp_manger == null)
+                {
+                    hp_manger = GameObject.FindObjectOfType<HP_Manager>();
+                }
+                hp_manger.Damaged(monster_.damage);
+                //StartCoroutine(character.OnBeatTime());
 
-     private void OnCollisionEnter2D(Collision2D collision)
-    {
-        HandleDamage(collision.gameObject);
+            }
+            
+
+        }
+        
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        HandleDamage(collision.gameObject);
+        if (collision.gameObject.CompareTag("Character"))
+        {
+            if (character.is_Beat == false)
+            {
+                if (hp_manger == null)
+                {
+                    hp_manger = GameObject.FindObjectOfType<HP_Manager>();
+                }
+                hp_manger.Damaged(monster_.damage);
+                //StartCoroutine(character.OnBeatTime());
+
+            }
+
+
+        }
+        
     }
 
-    private void HandleDamage(GameObject target)
-    {
-        if (!target.CompareTag("Character"))
-            return;
-
-        if (character == null || character.is_Beat)
-            return;
-
-        if (hp_manager == null || monster_ == null)
-            return;
-
-        hp_manager.Damaged(monster_.damage);
-    }
-
+ 
     public void health_manager(int damage)
     {
-        M_health -= damage;
-
-        if (M_health <= 0)
+        this.M_health -= damage;
+        if (this.M_health <= 0)
         {
+            Destroy(gameObject);
             if (Boss != null)
             {
                 Boss.Rest_count -= 1;
             }
 
-            Destroy(gameObject);
         }
     }
+   
+
+    private void Start()
+    {
+        is_endpoint = false;
+        hp_manger = GameObject.FindObjectOfType<HP_Manager>();
+        M_health = monster_.M_health;
+        character = GameObject.FindObjectOfType<CharacterMovement>();
+        Boss = GameObject.FindObjectOfType<Boss_Movement>();
+    }
+
+    private void Awake()
+    {
+        monsterRd = GetComponent<Rigidbody2D>();
+        //Invoke("Think", 5);//초기화 함수 안에 넣어서 실행될 때 마다 nextMove변수가 초기화됨
+    }
+
 }
