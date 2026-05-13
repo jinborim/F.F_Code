@@ -16,21 +16,20 @@ public class Boss_Movement : MonoBehaviour
     public CharacterMovement character;
     public Monster monster_;
 
-    public int oneShoting = 10;
-    public float speed = 150f;
-    public float interval = 5.0f;
+    public int oneShoting;
+    public float speed;
+    public float interval=5.0f;
     float delta = 0;
-    public float RestHealth = 150f;
+    public float RestHealth;
 
     public int Rest_count;
 
     bool isLeft = true;
     public bool is_movable;
-    public bool is_movetime = true;
+    public bool is_movetime;
     public bool Boss_is_Beat;
-    public float BeatTime = 1.5f;
-    public float movespeed = 3f;
-    
+    public float BeatTime;
+    public float movespeed=3f;
     private SpriteRenderer MonsterSprite;
 
     public SoundEffect_Manager soundEffect;
@@ -38,44 +37,98 @@ public class Boss_Movement : MonoBehaviour
 
 
     [SerializeField]
-    private GameObject Drop_prefap;
+    GameObject Drop_prefap;
 
     public EndPoint_boss[] endpoint_controll;
 
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //캐릭터는 기본적으로 isTrigger가 활성화되어있지 않기때문에 이 함수를 사용한다.
+        if (collision.gameObject.CompareTag("Character"))
+        {
+            if (character.is_Beat == false)
+            {
+                hp_manger.Damaged(monster_.damage);
+                //StartCoroutine(character.OnBeatTime());
+
+            }
+
+
+        }
+        if (collision.gameObject.CompareTag("endpoint"))
+        {
+            if (isLeft)
+            {
+                transform.eulerAngles = new Vector3(0, 180, 0);
+                isLeft = false;
+            }
+            else
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                isLeft = true;
+            }
+        }
+
+    }
+
+
+    // Start is called before the first frame update
     void Start()
     {
         Boss_ani = GetComponent<Animator>();
+        oneShoting = 10;
+        speed = 150f;
+        Boss_is_Beat = false;
+        is_movable = false;
+        is_movetime = true;
+        BeatTime = 1.5f;
         MonsterSprite = transform.GetComponent<SpriteRenderer>();
+        //StartCoroutine(Shooting(5));
+        Rest_count = 0;
+        RestHealth = 150;
         
         hp_manger = GameObject.FindObjectOfType<HP_Manager>();
+        
         character = GameObject.FindObjectOfType<CharacterMovement>();
+
         soundEffect = GameObject.FindObjectOfType<SoundEffect_Manager>();
+
         endpoint_controll = GameObject.FindObjectsOfType<EndPoint_boss>();
+
         bossMusic = GameObject.FindObjectOfType<Boss_Music_Changer>();
 
     }
 
+    // Update is called once per frame
     void Update()
     {
-        if (Inventory.invectoryActivated) return;
-        if (!is_movable) return;
-
-        delta += Time.deltaTime;
-
-        if (delta > interval)
+        if (Inventory.invectoryActivated == false)
         {
-            delta = 0f;
-            StartCoroutine(wait_howl());
-            interval = Random.Range(5f, 10f);
-        }
+            if (is_movable == true)
+            {
+                delta += Time.deltaTime;
+                if (delta > interval)
+                {
+                    delta = 0;
+                    //Boss_ani.SetTrigger("Howl");
+                    StartCoroutine(wait_howl());
 
-        if (is_movetime)
-        {
-            transform.Translate(Vector2.left * movespeed * Time.deltaTime);
+
+                    interval = Random.Range(5f, 10f);
+                }
+                if (is_movetime == true)
+                {
+                    transform.Translate(Vector2.left * movespeed * Time.deltaTime);
+                }
+
+            }
         }
+        
+        
     }
 
-       private IEnumerator wait_howl()
+    private IEnumerator wait_howl()
     {
         is_movetime = false;
         soundEffect.Effect_Sound("BOSSHOWL");
@@ -90,68 +143,54 @@ public class Boss_Movement : MonoBehaviour
     {
         is_movable = true;
     }
-    
-    private void OnCollisionEnter2D(Collision2D collision)
-    { if (collision.gameObject.CompareTag("Character"))
-        {
-            if (!character.is_Beat)
-            {
-                hp_manger.Damaged(monster_.damage);
-            }
-        }
-
-        if (collision.gameObject.CompareTag("endpoint"))
-        {
-            Flip();
-        }
-        }
-
-    }
+   
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-      if (collision.CompareTag("endpoint"))
+        if (collision.tag == "endpoint")
         {
-            Flip();
+            if (isLeft)
+            {
+                transform.eulerAngles = new Vector3(0, 180, 0);
+                isLeft = false;
+            }
+            else
+            {
+                transform.eulerAngles = new Vector3(0, 0, 0);
+                isLeft = true;
+            }
         }
     }
 
-    private void Flip()
-    {
-        if (isLeft)
-        {
-            transform.eulerAngles = new Vector3(0, 180, 0);
-        }
-        else
-        {
-            transform.eulerAngles = Vector3.zero;
-        }
 
-        isLeft = !isLeft;
-    }
 
 
     public void boss_pattern()
     {
-      int pattern = Random.Range(0, 3);
-
-        if (pattern == 0)
+        int random_pattern = Random.Range(0, 3);
+        switch (random_pattern)
         {
-            StartCoroutine(Monster_Spawner(Random.Range(1, 6)));
-        }
-        else
-        {
-            StartCoroutine(Shooting(Random.Range(1, 10)));
+            case 0:
+                Debug.Log("몬스터 스폰");
+                int random_index_M = Random.Range(1, 6);
+                StartCoroutine(Monster_Spawner(random_index_M));
+                return;
+            case 1 or 2:
+                Debug.Log("탄막");
+                int random_index_T = Random.Range(1, 10);
+                StartCoroutine(Shooting(random_index_T));
+                return;
         }
     }
 
 
     public void Change_Weapon()
     {
-       if (RestHealth <= 70)
+        if (RestHealth <= 70)
         {
             speed = 300f;
-            attack_obj = attackPrefabSet[Random.Range(0, attackPrefabSet.Length)];
+            int index = Random.Range(0, attackPrefabSet.Length);
+            attack_obj = attackPrefabSet[index];
         }
         else
         {
@@ -162,79 +201,105 @@ public class Boss_Movement : MonoBehaviour
 
     public void Change_Enemy()
     {
-       enemy_obj = EnemyPrefab[Random.Range(0, EnemyPrefab.Length)];
+        int index = Random.Range(0, EnemyPrefab.Length);
+        enemy_obj = EnemyPrefab[index];
     }
 
-    public IEnumerator Monster_Spawner(int count_)
+
+
+
+    public IEnumerator Monster_Spawner(int count_)//소환할 몬스터 수를 인자로 받기
     {
-         if (Rest_count > 0) yield break;
-
-        Rest_count = count_;
-
-        for (int i = 0; i < count_; i++)
+        if (Rest_count <= 0)
         {
-            Change_Enemy();
-            Instantiate(enemy_obj, transform.position, Quaternion.identity);
-        }
+            Rest_count = count_;
+            
+            for (int i = 0; i < count_; i++)
+            {
+                Change_Enemy();
+                GameObject obj = Instantiate(enemy_obj, this.transform.position, Quaternion.identity);
 
-        yield return new WaitForSeconds(0.5f);
+            }
+            yield return new WaitForSeconds(0.5f);
+            
+        }
+        
+        
+
     }
 
-    public IEnumerator Shooting(int count_)
-         Change_Weapon();
 
-        for (int j = 0; j < count_; j++)
+
+
+
+    public IEnumerator Shooting(int count_)//나중에 어떤 숫자를 받아서 do-while문 바꾸기(for문으로만 반복해서, 몇번이나 쏠건지를 정한다)
+    {
+        float angle = 360 / oneShoting;
+        Change_Weapon();
+
+        for(int j=0; j<count_; j++)
         {
             for (int i = 0; i < oneShoting; i++)
             {
-                GameObject obj = Instantiate(attack_obj, transform.position, Quaternion.identity);
+                GameObject obj = Instantiate(attack_obj, this.transform.position, Quaternion.identity);
 
-                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
-                Vector2 dir = new Vector2(
-                    Mathf.Cos(Mathf.PI * 2 * i / oneShoting),
-                    Mathf.Sin(Mathf.PI * 2 * i / oneShoting)
-                );
+                Rigidbody2D obj_RD = obj.GetComponent<Rigidbody2D>();
+                obj_RD.AddForce(new Vector2(speed * Mathf.Cos(Mathf.PI * 2 * i / oneShoting), speed * Mathf.Sin(Mathf.PI * i * 2 / oneShoting)));
 
-                rb.AddForce(dir * speed);
-                obj.transform.Rotate(0f, 0f, 360 * i / oneShoting - 90);
+                obj.transform.Rotate(new Vector3(0f, 0f, 360 * i / oneShoting - 90));
             }
             yield return new WaitForSeconds(1f);
         }
+        
+
     }
 
     public IEnumerator BossOnBeatTime()
     {
-       if (MonsterSprite == null) yield break;
-
-        for (int i = 0; i < BeatTime * 5; i++)
+        if (MonsterSprite != null)
         {
-            MonsterSprite.color = (i % 2 == 0)
-                ? new Color32(130, 140, 200, 90)
-                : new Color32(130, 140, 200, 180);
+            for (int i = 0; i < BeatTime * 5; ++i)
+            {
+                if (i % 2 == 0)
+                    MonsterSprite.color = new Color32(130, 140, 200, 90);
+                else
+                    MonsterSprite.color = new Color32(130, 140, 200, 180);
 
-            yield return new WaitForSeconds(0.3f);
+                yield return new WaitForSeconds(0.3f);
+            }
+
+            //Alpha Effect End
+            MonsterSprite.color = new Color32(255, 255, 255, 255);
+
+            Boss_is_Beat = false;
+
+            yield return null;
         }
-
-        MonsterSprite.color = Color.white;
-        Boss_is_Beat = false;
         
     }
 
+
     public void BOSSDIE()
     {
-      if (soundEffect != null)
-            soundEffect.Effect_Sound("BOSSDIE");
-
-        if (bossMusic != null)
-            bossMusic.Audio_Source.Pause();
-
-        Instantiate(Drop_prefap, transform.position, transform.rotation);
-
-        foreach (var end in endpoint_controll)
+        soundEffect.Effect_Sound("BOSSDIE");
+        bossMusic.Audio_Source.Pause();
+        GameObject drop_item = Instantiate(Drop_prefap, transform.position, transform.rotation);
+        for (int i = 0; i < endpoint_controll.Length; i++)
         {
-            end.End_collider.isTrigger = true;
+            endpoint_controll[i].End_collider.isTrigger = true;
         }
 
+        GameObject.Find("Block").transform.Find("Block_manager").gameObject.SetActive(false);
+        Potion[] potion = GameObject.FindObjectsOfType<Potion>();
+        Enemy[] enemy = GameObject.FindObjectsOfType<Enemy>();
+        for(int i=0; i<potion.Length; i++)
+        {
+            Destroy(potion[i].gameObject);
+        }
+        for (int i = 0; i < enemy.Length; i++)
+        {
+            Destroy(enemy[i].gameObject);
+        }
         Destroy(gameObject, 0.3f);
     }
 
