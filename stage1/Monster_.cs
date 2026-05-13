@@ -5,49 +5,29 @@ using UnityEngine.UI;
 
 public class Monster_ : MonoBehaviour
 {
-    public float StartHealth; // 최대 체력
-    public float Health; //현재 체력
-    
-    private MonsterMovement monster_move; 
+    public float StartHealth;
+    public float Health;
+    public MonsterMovement monster_move;
 
-    [SerializeField]       
-    public GameObject HealthBar; // 체력 바 UI
-
-   private void Start()
+    public GameObject HealthBar;
+    void Awake()
     {
-        monster_move = GetComponent<MonsterMovement>();
+        
+    }
 
-        if (monster_move != null)
-        {
-            StartHealth = monster_move.M_health;
-            Health = StartHealth;
-        }
-
-        UpdateUI();
+    private void Start()
+    {
+        monster_move = this.GetComponent<MonsterMovement>();
+        StartHealth = monster_move.M_health;
+        Health = monster_move.M_health;
     }
 
     public void GetDamage(int damage)
     {
         Health -= damage;
-        Health = Mathf.Clamp(Health, 0, StartHealth);
+        HealthBar.GetComponent<Image>().fillAmount = Health / StartHealth;
 
-        UpdateUI();
-
-        if (Health <= 0)
-        {
-            Die();
-        }
     }
 
-    private void UpdateUI()
-    {
-        if (healthBar == null) return;
 
-        healthBar.fillAmount = Health / StartHealth;
-    }
-
-    private void Die()
-    {
-        Destroy(gameObject);
-    }
 }
